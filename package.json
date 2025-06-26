@@ -1,9 +1,14 @@
 {
   "name": "split-join",
   "displayName": "Split Join",
-  "icoin": "icon.png",
+  "icon": "icon.png",
   "description": "A VS Code extension for splitting and joining text, inspired by mini.splitjoin.",
-  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/altnp/vscode-split-join"
+  },
+  "publisher": "NAlt",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.100.0"
   },
