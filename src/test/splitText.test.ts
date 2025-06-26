@@ -68,4 +68,16 @@ suite("Split Text", () => {
       '{\n    "items":\n    [\n        {\n            "id": 1,\n            "value": "A"\n        },\n        {\n            "id": 2,\n            "value": "B"\n        }\n    ]\n}'
     );
   });
+
+  test("Splits One True Brace style complex nested JSON", () => {
+    const text =
+      '{"user": {"name": "Alice", "roles": ["admin", "editor"], "meta": {"active": true, "groups": [{"id": 1, "name": "group1"}, {"id": 2, "name": "group2"}]}}}';
+    const range = { start: 0, end: text.length - 1 };
+    const result = splitText(text, range);
+
+    assert.strictEqual(
+      result,
+      '{\n    "user": {\n        "name": "Alice",\n        "roles": [\n            "admin",\n            "editor"\n        ],\n        "meta": {\n            "active": true,\n            "groups": [\n                {\n                    "id": 1,\n                    "name": "group1"\n                },\n                {\n                    "id": 2,\n                    "name": "group2"\n                }\n            ]\n        }\n    }\n}'
+    );
+  });
 });
