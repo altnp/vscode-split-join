@@ -1,0 +1,92 @@
+{
+  "name": "split-join",
+  "displayName": "Split Join",
+  "icoin": "icon.png",
+  "description": "A VS Code extension for splitting and joining text, inspired by mini.splitjoin.",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "editor.splitJoin",
+        "title": "Split/Join"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Split Join",
+      "properties": {
+        "splitJoin.bracketPairs": {
+          "type": "array",
+          "description": "Defines the types of brackets to use for finding the closest enclosing pair, regardless of priority. Each entry should be a two-character string, e.g. '()', '[]', '{}'.",
+          "default": [
+            "()",
+            "[]",
+            "{}"
+          ],
+          "markdownDescription": "Defines the types of brackets to use for finding the closest enclosing pair, regardless of priority. Each entry should be a two-character string, e.g. '()', '[]', '{}'.",
+          "title": "Bracket Pairs"
+        },
+        "splitJoin.delimiters": {
+          "type": "array",
+          "description": "Characters to look for, in priority order, to split/join on. Each entry should be a single character string, e.g. ',' or ';'.",
+          "default": [
+            ";",
+            ","
+          ],
+          "markdownDescription": "Characters to look for, in priority order, to split/join on. Each entry should be a single character string, e.g. ',' or ';'.",
+          "title": "Delimiters"
+        },
+        "splitJoin.maxScanLength": {
+          "type": "number",
+          "description": "Maximum number of characters to scan when searching for bracket pairs. 0 means unlimited (whole file).",
+          "default": 0,
+          "title": "Max Characters to Scan"
+        },
+        "splitJoin.bracketStyle": {
+          "type": "object",
+          "description": "Controls the bracket style for split/join. Object mapping language ids to styles. Use '*' for default. Styles: 'allman', 'one-true-brace'.",
+          "default": {
+            "*": "one-true-brace",
+            "csharp": "allman"
+          },
+          "markdownDescription": "Controls the bracket style for split/join. Object mapping language ids to styles. Use '*' for default. Styles: 'allman', 'one-true-brace'. Example: { \"*\": \"one-true-brace\", \"csharp\": \"allman\" }.",
+          "title": "Bracket Style"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "editor.splitJoin",
+        "key": "ctrl+j",
+        "when": "editorTextFocus && !editorReadonly"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
