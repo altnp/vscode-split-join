@@ -10,3 +10,8 @@ All notable changes to the "split-join" extension will be documented in this fil
 - Splits single-line bracketed content into multiple lines
 - Maintains formatting and indentation
 - Handles nested structures and string literals
+
+## [1.0.2] - 2025-07-01
+
+- Minor refactoring
+- No functionality changes

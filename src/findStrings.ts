@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
-import { Interval } from "./interval";
+import { Interval } from "./Interval";
 
-export function findStrings(document: vscode.TextDocument, position: vscode.Position, maxScanLength: number = 0): Interval[] {
+export function findStrings(
+  document: vscode.TextDocument,
+  position: vscode.Position,
+  maxScanLength: number = 0
+): Interval[] {
   const text = document.getText();
   let scanStart = 0;
   let scanEnd = text.length;

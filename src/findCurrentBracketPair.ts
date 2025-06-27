@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Interval } from "./interval";
+import { Interval } from "./Interval";
 
 function isBracketPair(pair: string): boolean {
   return pair.length === 2;

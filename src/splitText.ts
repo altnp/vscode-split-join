@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
-import { Interval } from "./interval";
+import { Interval } from "./Interval";
 import { BracketStyle } from "./BracketStyle";
+import { WhitespaceBuffer } from "./WhitespaceBuffer";
 
 function getIndentString(): string {
   try {
@@ -31,16 +32,9 @@ function getIndentString(): string {
   }
 }
 
-function indentString(text: string, level: number): string {
+function indentString(level: number): string {
   const indent = getIndentString();
-
-  let result = "";
-  for (let i = 0; i < level; i++) {
-    result += indent;
-  }
-  result += text;
-
-  return result;
+  return indent.repeat(level);
 }
 
 function findLineStart(text: string, start: number): number {
@@ -58,7 +52,8 @@ function findLineStart(text: string, start: number): number {
   return 0;
 }
 
-function getIndentLevel(line: string, indent: string): number {
+function getIndentLevel(line: string): number {
+  let indent = getIndentString();
   let count = 0;
 
   while (line.startsWith(indent.repeat(count + 1))) {
@@ -79,11 +74,10 @@ export function splitText(
   const { start, end } = range;
   let result = "";
 
-  let indent = getIndentString();
   let lineStart = findLineStart(text, start);
   const line = text.slice(lineStart, start);
 
-  let indentationLevel = getIndentLevel(line, indent);
+  let indentationLevel = getIndentLevel(line);
 
   const bracketMap = new Map<string, string>();
   for (const pair of bracketPairs) {
@@ -93,13 +87,12 @@ export function splitText(
   }
 
   let openBrackets: string[] = [];
-  let pendingWhitespace = "";
+  let whitespace = new WhitespaceBuffer();
   let suppressWhitespace = false;
 
   for (let i = start; i <= end; i++) {
     if (ignoreRanges.some((r) => i >= r.start && i < r.end)) {
-      result += pendingWhitespace + text[i];
-      pendingWhitespace = "";
+      result += whitespace.retrieve() + text[i];
 
       if (suppressWhitespace) {
         suppressWhitespace = false;
@@ -110,27 +103,22 @@ export function splitText(
 
     if (/\s/.test(text[i])) {
       if (!suppressWhitespace) {
-        pendingWhitespace += text[i];
+        whitespace.append(text[i]);
       }
 
       continue;
     }
 
     if (bracketMap.has(text[i])) {
-      if (bracketStyle === "allman") {
-        if (result.length > 0 && !/\n\s*$/.test(result)) {
-          result += "\n" + indentString("", indentationLevel);
-        }
-        result += text[i];
-      } else {
-        result += pendingWhitespace + text[i];
+      if (bracketStyle === "allman" && result.length > 0) {
+        whitespace.set("\n" + indentString(indentationLevel));
       }
+
+      result += whitespace.retrieve() + text[i];
       openBrackets.push(text[i]);
       indentationLevel++;
 
-      pendingWhitespace = "";
-
-      result += "\n" + indentString("", indentationLevel);
+      whitespace.set("\n" + indentString(indentationLevel));
       suppressWhitespace = true;
       continue;
     }
@@ -138,22 +126,20 @@ export function splitText(
     if (openBrackets.length > 0 && bracketMap.get(openBrackets[openBrackets.length - 1]) === text[i]) {
       openBrackets.pop();
       indentationLevel--;
-      pendingWhitespace = "";
+      whitespace.clear();
 
-      if (!/\n\s*$/.test(result)) {
-        result += "\n";
-      }
-      result += indentString(text[i], indentationLevel);
+      result += "\n";
+      result += indentString(indentationLevel) + text[i];
       if (i < end && !delimiters.includes(text[i + 1])) {
-        result += "\n";
-        pendingWhitespace += indentString("", indentationLevel);
+        whitespace.set("\n" + indentString(indentationLevel));
       }
       suppressWhitespace = true;
       continue;
     }
 
     if (delimiters.includes(text[i])) {
-      result += text[i] + "\n" + indentString("", indentationLevel);
+      result += text[i];
+      whitespace.set("\n" + indentString(indentationLevel));
       suppressWhitespace = true;
       continue;
     }
@@ -161,9 +147,7 @@ export function splitText(
     if (suppressWhitespace) {
       suppressWhitespace = false;
     }
-
-    result += pendingWhitespace + text[i];
-    pendingWhitespace = "";
+    result += whitespace.retrieve() + text[i];
   }
 
   if (bracketStyle === "allman" && lineStart < start) {
