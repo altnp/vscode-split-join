@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { joinText } from "../splitJoin";
+import { joinText } from "../joinText";
 
 suite("Join Text", () => {
   test("Joins simple multi-line content", () => {

@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { splitText } from "../splitJoin";
+import { splitText } from "../splitText";
 
 suite("Split Text", () => {
   test("Splits simple parens", () => {
