@@ -8,9 +8,9 @@
     "url": "https://github.com/altnp/vscode-split-join"
   },
   "publisher": "NAlt",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.98.0"
   },
   "categories": [
     "Other"
@@ -84,14 +84,14 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.100.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.98.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
-    "eslint": "^9.25.1",
-    "typescript": "^5.8.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
   }
 }
