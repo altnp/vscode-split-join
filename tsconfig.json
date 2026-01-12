@@ -11,5 +11,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true
   },
-  "exclude": ["/src/test/**"]
+  "exclude": []
 }

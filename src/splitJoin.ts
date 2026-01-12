@@ -1,56 +1,44 @@
 import { Range, TextEditor } from "vscode";
-import { findStrings } from "./findStrings";
-import { findCurrentBracketPair } from "./findCurrentBracketPair";
-import { splitText } from "./splitText";
-import { BracketStyle } from "./BracketStyle";
-import { joinText } from "./joinText";
+import {
+  DetectConfig,
+  findBracketRegionAtOffset,
+  getBaseIndentFromLine,
+  joinRegionText,
+  splitRegionText,
+} from "./core/splitJoinText";
 
-export async function splitJoin(
-  editor: TextEditor,
-  maxScanLength: number,
-  bracketPairs: string[],
-  delimiters: string[],
-  bracketStyles: Record<string, BracketStyle>
-) {
+function getIndentUnit(editor: TextEditor): string {
+  const insertSpaces = editor.options.insertSpaces;
+  const tabSize = editor.options.tabSize;
+
+  if (insertSpaces && typeof tabSize === "number") {
+    return " ".repeat(tabSize);
+  }
+  return "\t";
+}
+
+export async function splitJoin(editor: TextEditor, detect: DetectConfig) {
   const document = editor.document;
   const position = editor.selection.active;
+  const text = document.getText();
+  const offset = document.offsetAt(position);
 
-  const stringRanges = findStrings(document, position, maxScanLength);
-  const ignoreRanges = [...stringRanges];
-
-  const currentPair = findCurrentBracketPair(document, position, bracketPairs, maxScanLength, ignoreRanges);
-
-  if (currentPair) {
-    const startLine = currentPair.start.line;
-    const endLine = currentPair.end.line;
-    let text: string;
-    const startOffset = document.offsetAt(currentPair.start);
-    const endOffset = document.offsetAt(currentPair.end);
-
-    const languageId = document.languageId;
-    let bracketStyle: BracketStyle;
-
-    if (typeof bracketStyles === "object" && bracketStyles !== null) {
-      bracketStyle = bracketStyles[languageId] || bracketStyles["*"] || "one-true-brace";
-    } else {
-      bracketStyle = "one-true-brace";
-    }
-
-    if (startLine !== endLine) {
-      text = joinText(document.getText(), { start: startOffset, end: endOffset });
-    } else {
-      text = splitText(
-        document.getText(),
-        { start: startOffset, end: endOffset },
-        ignoreRanges,
-        delimiters,
-        bracketPairs,
-        bracketStyle
-      );
-    }
-
-    await editor.edit((editBuilder) => {
-      editBuilder.replace(new Range(document.positionAt(startOffset), document.positionAt(endOffset + 1)), text);
-    });
+  const region = findBracketRegionAtOffset(text, offset, { brackets: detect.brackets });
+  if (!region) {
+    return;
   }
+
+  const regionText = text.slice(region.start, region.end + 1);
+  const splitConfig = {
+    baseIndent: getBaseIndentFromLine(document.lineAt(document.positionAt(region.start).line).text),
+    indentUnit: getIndentUnit(editor),
+  };
+
+  const replacement = regionText.includes("\n")
+    ? joinRegionText(regionText)
+    : splitRegionText(regionText, splitConfig, detect);
+
+  await editor.edit((editBuilder) => {
+    editBuilder.replace(new Range(document.positionAt(region.start), document.positionAt(region.end + 1)), replacement);
+  });
 }

@@ -2,6 +2,11 @@
 
 All notable changes to the "split-join" extension will be documented in this file.
 
+## [1.0.4]
+
+- Rewrite split/join behavior to match `mini.splitjoin` (top-level separator detection; minimal join; no recursive pretty-print).
+- Replace settings with `splitJoin.detect.*` (remove `splitJoin.delimiters`, `splitJoin.bracketStyle`, `splitJoin.maxScanLength`, `splitJoin.bracketPairs`).
+
 ## [1.0.3] - 2025-07-25
 
 - Support for older VS Code Engines

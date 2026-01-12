@@ -8,7 +8,7 @@
     "url": "https://github.com/altnp/vscode-split-join"
   },
   "publisher": "NAlt",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "engines": {
     "vscode": "^1.98.0"
   },
@@ -28,42 +28,36 @@
       "type": "object",
       "title": "Split Join",
       "properties": {
-        "splitJoin.bracketPairs": {
+        "splitJoin.detect.brackets": {
           "type": "array",
-          "description": "Defines the types of brackets to use for finding the closest enclosing pair, regardless of priority. Each entry should be a two-character string, e.g. '()', '[]', '{}'.",
+          "description": "Bracket pairs in which split/join should operate. Each entry should be a two-character string, e.g. '()', '[]', '{}'.",
           "default": [
             "()",
             "[]",
             "{}"
           ],
-          "markdownDescription": "Defines the types of brackets to use for finding the closest enclosing pair, regardless of priority. Each entry should be a two-character string, e.g. '()', '[]', '{}'.",
-          "title": "Bracket Pairs"
+          "markdownDescription": "Bracket pairs in which split/join should operate. Each entry should be a two-character string, e.g. '()', '[]', '{}'.",
+          "title": "Detect: Brackets"
         },
-        "splitJoin.delimiters": {
+        "splitJoin.detect.separator": {
+          "type": "string",
+          "description": "JavaScript RegExp source used to detect argument separators (matched at top level only).",
+          "default": ",",
+          "markdownDescription": "JavaScript RegExp source used to detect argument separators (matched at top level only). Example: `[,;]`.",
+          "title": "Detect: Separator"
+        },
+        "splitJoin.detect.excludeRegions": {
           "type": "array",
-          "description": "Characters to look for, in priority order, to split/join on. Each entry should be a single character string, e.g. ',' or ';'.",
+          "description": "Region kinds in which separators are ignored during detection. Supported values: (), [], {}, \"\", and ''.",
           "default": [
-            ";",
-            ","
+            "()",
+            "[]",
+            "{}",
+            "\"\"",
+            "''"
           ],
-          "markdownDescription": "Characters to look for, in priority order, to split/join on. Each entry should be a single character string, e.g. ',' or ';'.",
-          "title": "Delimiters"
-        },
-        "splitJoin.maxScanLength": {
-          "type": "number",
-          "description": "Maximum number of characters to scan when searching for bracket pairs. 0 means unlimited (whole file).",
-          "default": 0,
-          "title": "Max Characters to Scan"
-        },
-        "splitJoin.bracketStyle": {
-          "type": "object",
-          "description": "Controls the bracket style for split/join. Object mapping language ids to styles. Use '*' for default. Styles: 'allman', 'one-true-brace'.",
-          "default": {
-            "*": "one-true-brace",
-            "csharp": "allman"
-          },
-          "markdownDescription": "Controls the bracket style for split/join. Object mapping language ids to styles. Use '*' for default. Styles: 'allman', 'one-true-brace'. Example: { \"*\": \"one-true-brace\", \"csharp\": \"allman\" }.",
-          "title": "Bracket Style"
+          "markdownDescription": "Region kinds in which separators are ignored during detection. Supported values: `()`, `[]`, `{}`, `\"\"`, `''`.",
+          "title": "Detect: Exclude Regions"
         }
       }
     },
@@ -77,11 +71,12 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "clean": "node -e \"require('node:fs').rmSync('out', { recursive: true, force: true })\"",
+    "compile": "npm run clean && tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "node --test out/test/*.test.js"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
